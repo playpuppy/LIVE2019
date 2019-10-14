@@ -4,7 +4,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/LIVE2019/editor.worker.js"
   },
   {
-    "revision": "dd6669e6b6ae572dc1ccf10dcc38a222",
+    "revision": "be16451dabb43436d0b4a9ea39ee73f2",
     "url": "/LIVE2019/index.html"
   },
   {
