@@ -122,7 +122,7 @@ const loadFile: (path: string) => Promise<string> = path => {
 export const fetchSetting = (dispatch: (action: ReduxActions) => void) => (
   path: string
 ): Promise<void> =>
-  loadFile(`/course/${path}/setting.json`)
+  loadFile(`/LIVE2019/course/${path}/setting.json`)
     .then((s: string) => {
       return JSON.parse(s);
     })
@@ -137,8 +137,8 @@ export const fetchContent = (dispatch: (action: ReduxActions) => void) => (
   coursePath: string,
   path: string
 ): Promise<void> =>
-  loadFile(`/course/${coursePath}/${path}/index.md`).then((content: string) =>
-    dispatch(setContent(content))
+  loadFile(`/LIVE2019/course/${coursePath}/${path}/index.md`).then(
+    (content: string) => dispatch(setContent(content))
   );
 
 export const fetchSample = (dispatch: (action: ReduxActions) => void) => (
@@ -148,13 +148,13 @@ export const fetchSample = (dispatch: (action: ReduxActions) => void) => (
   path: string
 ): void => {
   const sample = window.sessionStorage.getItem(
-    `/course/${coursePath}/${path}/sample.py`
+    `/LIVE2019/course/${coursePath}/${path}/sample.py`
   );
   if (sample) {
     dispatch(setCode(sample));
     trancepile(dispatch)(puppy, sample, false);
   } else {
-    loadFile(`/course/${coursePath}/${path}/sample.py`).then(
+    loadFile(`/LIVE2019/course/${coursePath}/${path}/sample.py`).then(
       (sample: string) => {
         dispatch(setCode(sample));
         trancepile(dispatch)(puppy, sample, false);
@@ -210,7 +210,7 @@ export const fetchCourses = (
   const get_course: Promise<void>[] = [];
   ['Puppy', 'PuppyCourse'].forEach(path => {
     get_course.push(
-      loadFile(`/course/${path}/setting.json`)
+      loadFile(`/LIVE2019/course/${path}/setting.json`)
         .then((s: string) => {
           return JSON.parse(s);
         })
