@@ -179,25 +179,25 @@ class FuncType extends Type {
   }
 
   public isPattern() {
-    for (const ty of this.types) {
+    this.types.forEach(ty => {
       if (ty.isPattern()) return true;
-    }
+    });
     return false;
   }
 
   public hasAlpha(): boolean {
-    for (const ty of this.types) {
+    this.types.forEach(ty => {
       if (ty.hasAlpha()) return true;
-    }
+    });
     return false;
   }
 
   public toVarType(map: any) {
     if (this.hasAlpha()) {
       const v: Type[] = [];
-      for (const ty of this.types) {
+      this.types.forEach(ty => {
         v.push(ty.toVarType(map));
-      }
+      });
       return new FuncType(...v);
     }
     return this;
@@ -286,11 +286,11 @@ class UnionType extends Type {
   }
 
   public accept(ty: Type, _update: boolean): boolean {
-    for (const ty0 of this.types) {
+    this.types.forEach(ty0 => {
       if (ty0.accept(ty, false)) {
         return true;
       }
-    }
+    });
     console.log(`FAIL ${ty} ${this.toString()}`);
     return false;
   }
@@ -300,20 +300,20 @@ class UnionType extends Type {
   }
 
   public hasAlpha(): boolean {
-    for (const ty of this.types) {
+    this.types.forEach(ty => {
       if (ty.hasAlpha()) {
         return true;
       }
-    }
+    });
     return false;
   }
 
   public toVarType(map: any) {
     if (this.hasAlpha()) {
       const ts: Type[] = [];
-      for (const ty of this.types) {
+      this.types.forEach(ty => {
         ts.push(ty.toVarType(map));
-      }
+      });
       return new UnionType(...ts);
     }
     return this;
@@ -350,22 +350,22 @@ const EmptyNumberSet: number[] = [];
 
 const unionSet = (a: number[], b: number[], c?: number[]) => {
   const A: number[] = [];
-  for (const id of a) {
+  a.forEach(id => {
     if (A.indexOf(id) === -1) {
       A.push(id);
     }
-  }
-  for (const id of b) {
+  });
+  b.forEach(id => {
     if (A.indexOf(id) === -1) {
       A.push(id);
     }
-  }
+  });
   if (c !== undefined) {
-    for (const id of b) {
+    b.forEach(id => {
       if (A.indexOf(id) === -1) {
         A.push(id);
       }
-    }
+    });
   }
   return A;
 };
@@ -416,16 +416,16 @@ class VarType extends Type {
           this.varMap[v1.varid] as number[],
           [v1.varid, this.varid]
         );
-        for (const id of u) {
+        u.forEach(id => {
           this.varMap[id] = u;
-        }
+        });
         return true;
       }
       if (!v1.isPattern()) {
         const u = this.varMap[this.varid] as number[];
-        for (const id of u) {
+        u.forEach(id => {
           this.varMap[id] = v1;
-        }
+        });
         this.varMap[this.varid] = v1;
       }
     }
@@ -597,11 +597,11 @@ const modules: any = {
 const symbolPackageMap: any = {};
 
 const checkSymbolNames = () => {
-  for (const pkgname of Object.keys(modules)) {
-    for (const name of Object.keys(modules[pkgname])) {
+  Object.keys(modules).forEach(pkgname => {
+    Object.keys(modules[pkgname]).forEach(name => {
       symbolPackageMap[name] = pkgname;
-    }
-  }
+    });
+  });
 };
 checkSymbolNames();
 
@@ -791,12 +791,12 @@ class Env {
   }
 
   public from_import(pkg: any, list?: string[]) {
-    for (const name of Object.keys(pkg)) {
+    Object.keys(pkg).forEach(name => {
       //console.log(name);
       if (list === undefined || list.indexOf(name) !== -1) {
         this.vars[name] = pkg[name];
       }
-    }
+    });
   }
 
   public setModule(name: string, options: any) {
@@ -1091,7 +1091,7 @@ class Transpiler {
   }
 
   public Source(env: Env, t: ParseTree, out: string[]) {
-    for (const subtree of t.subs()) {
+    t.subs().forEach(subtree => {
       try {
         const out2: string[] = [];
         out2.push(env.get('@indent'));
@@ -1103,7 +1103,7 @@ class Transpiler {
           throw e;
         }
       }
-    }
+    });
     return tVoid;
   }
 
@@ -1113,11 +1113,11 @@ class Transpiler {
     const env = new Env(penv);
     env.set('@indent', nested);
     out.push('{\n');
-    for (const subtree of t.subs()) {
+    t.subs().forEach(subtree => {
       out.push(env.get('@indent'));
       this.conv(env, subtree, out);
       env.emitAutoYield(out);
-    }
+    });
     out.push(indent + '}');
     return tVoid;
   }
@@ -1204,13 +1204,13 @@ class Transpiler {
       return: types[0],
       hasReturn: false,
     });
-    for (const p of t['params'].subs()) {
+    t['params'].subs().forEach(p => {
       const pname = p.tokenize('name');
       const ptype = new VarType(env, p['name']);
       const symbol = lenv.declVar(pname, ptype);
       names.push(symbol.code);
       types.push(ptype);
-    }
+    });
     const funcType = new FuncType(...types);
     out.push(`(${names.join(', ')}) => `);
     this.conv(lenv, t['body'], out);
@@ -1554,10 +1554,10 @@ class Transpiler {
 
   public Data(env: Env, t: ParseTree, out: string[]) {
     out.push('{');
-    for (const sub of t.subs()) {
+    t.subs().forEach(sub => {
       this.conv(env, sub, out);
       out.push(',');
-    }
+    });
     out.push('}');
     return tOption;
   }
@@ -1605,13 +1605,13 @@ class Transpiler {
   public List(env: Env, t: ParseTree, out: string[]) {
     var ty = new VarType(env, t);
     out.push('[');
-    for (const sub of t.subs()) {
+    t.subs().forEach(sub => {
       ty = this.check(ty, env, sub, out, {
         type: 'error',
         key: 'AllTypeAsSame', //全ての要素を同じ型に揃えてください
       });
       out.push(',');
-    }
+    });
     out.push(']');
     return new ListType(ty);
   }
@@ -1619,7 +1619,7 @@ class Transpiler {
   public Format(env: Env, t: ParseTree, out: string[]) {
     var c = 0;
     out.push('(');
-    for (const e of t.subs()) {
+    t.subs().forEach(e => {
       if (c > 0) {
         out.push('+');
       }
@@ -1635,7 +1635,7 @@ class Transpiler {
         }
       }
       c++;
-    }
+    });
     out.push(')');
     return tString;
   }
