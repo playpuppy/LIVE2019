@@ -12,7 +12,7 @@ import { QueryParams } from './index';
 type AppProps = { qs: QueryParams; hash: string };
 
 const App: React.FC<AppProps> = (props: AppProps) => {
-  const coursePath = props.qs.course ? props.qs.course : 'PuppyCourse';
+  const coursePath = props.qs.course ? props.qs.course : 'LIVE2019';
   const page = props.hash !== '' ? parseInt(props.hash.substr(1)) : 0;
   return (
     <div className="App">

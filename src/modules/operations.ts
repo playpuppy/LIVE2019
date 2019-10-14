@@ -208,7 +208,7 @@ export const fetchCourses = (
 ) => (): void => {
   const courses: { [path: string]: CourseShape } = {};
   const get_course: Promise<void>[] = [];
-  ['Puppy', 'PuppyCourse'].forEach(path => {
+  ['Puppy', 'PuppyCourse', 'LIVE2019'].forEach(path => {
     get_course.push(
       loadFile(`/LIVE2019/course/${path}/setting.json`)
         .then((s: string) => {
