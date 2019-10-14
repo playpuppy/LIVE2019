@@ -557,17 +557,19 @@ export class Puppy {
       };
       this.resize(this.render!.options.width!, this.render!.options.height!);
       Render['lookAt'](this.render, this.world!.view);
-      Object.keys(options).map((key: string) => {
-        if (this.world && key in this.world) {
-          if (key == 'background') {
-            this.render!.options['background'] = options['background'];
+      if (options) {
+        Object.keys(options).map((key: string) => {
+          if (this.world && key in this.world) {
+            if (key == 'background') {
+              this.render!.options['background'] = options['background'];
+            }
+            this.world[key] = options[key];
           }
-          this.world[key] = options[key];
-        }
-        if (this.engine && key in this.engine.world) {
-          this.engine.world[key] = options[key];
-        }
-      });
+          if (this.engine && key in this.engine.world) {
+            this.engine.world[key] = options[key];
+          }
+        });
+      }
     }
   };
 

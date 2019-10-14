@@ -179,16 +179,16 @@ class FuncType extends Type {
   }
 
   public isPattern() {
-    this.types.forEach(ty => {
-      if (ty.isPattern()) return true;
-    });
+    if (this.types.some(ty => ty.isPattern())) {
+      return true;
+    }
     return false;
   }
 
   public hasAlpha(): boolean {
-    this.types.forEach(ty => {
-      if (ty.hasAlpha()) return true;
-    });
+    if (this.types.some(ty => ty.hasAlpha())) {
+      return true;
+    }
     return false;
   }
 
@@ -286,11 +286,9 @@ class UnionType extends Type {
   }
 
   public accept(ty: Type, _update: boolean): boolean {
-    this.types.forEach(ty0 => {
-      if (ty0.accept(ty, false)) {
-        return true;
-      }
-    });
+    if (this.types.some(ty0 => ty0.accept(ty, false))) {
+      return true;
+    }
     console.log(`FAIL ${ty} ${this.toString()}`);
     return false;
   }
@@ -300,11 +298,9 @@ class UnionType extends Type {
   }
 
   public hasAlpha(): boolean {
-    this.types.forEach(ty => {
-      if (ty.hasAlpha()) {
-        return true;
-      }
-    });
+    if (this.types.some(ty => ty.hasAlpha())) {
+      return true;
+    }
     return false;
   }
 
