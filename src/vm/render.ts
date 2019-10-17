@@ -18,7 +18,7 @@ export const myRender = render => {
     ) {
       image.src = imagePath;
     } else {
-      image.src = `/image/${imagePath}`;
+      image.src = `/LIVE2019/image/${imagePath}`;
     }
     return image;
   };
