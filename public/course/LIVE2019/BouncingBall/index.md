@@ -1,18 +1,14 @@
 # Graphics and Motion
 
 An object that moves on the physics engine can be created by just describing one line.
-<br>
 
 `Circle(500, 100)`
-<br>
-There are two things that must be written at the minimum.
-<br>
 
+There are two things that must be written at the minimum.
 - shape
 - x and y coordinates.
 
 The first and second arguments are automatically read as x and y coordinates.
-<br>
 If you want to set more options, you can add them after the coordinates.
 
 Option example
