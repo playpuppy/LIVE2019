@@ -20,7 +20,7 @@ class Type {
   public psize() {
     return 0;
   }
-  public ptype(_index: number): Type {
+  public ptype(index: number): Type {
     return this;
   }
 
@@ -28,7 +28,7 @@ class Type {
   //   return false;
   // }
 
-  public accept(_ty: Type, _update: boolean): boolean {
+  public accept(ty: Type, update: boolean): boolean {
     return false;
   }
 
@@ -44,7 +44,7 @@ class Type {
     return false;
   }
 
-  public toVarType(_map: any): Type {
+  public toVarType(map: any): Type {
     return this;
   }
 }
@@ -111,7 +111,7 @@ class AnyType extends BaseType {
     super('any', isOptional);
   }
 
-  public accept(ty: Type, _update: boolean): boolean {
+  public accept(ty: Type, update: boolean): boolean {
     const v = ty.realType();
     if (v instanceof VoidType) {
       return false;
@@ -179,15 +179,15 @@ class FuncType extends Type {
   }
 
   public isPattern() {
-    if (this.types.some(ty => ty.isPattern())) {
-      return true;
+    for (const ty of this.types) {
+      if (ty.isPattern()) return true;
     }
     return false;
   }
 
   public hasAlpha(): boolean {
-    if (this.types.some(ty => ty.hasAlpha())) {
-      return true;
+    for (const ty of this.types) {
+      if (ty.hasAlpha()) return true;
     }
     return false;
   }
@@ -195,9 +195,9 @@ class FuncType extends Type {
   public toVarType(map: any) {
     if (this.hasAlpha()) {
       const v: Type[] = [];
-      this.types.forEach(ty => {
+      for (const ty of this.types) {
         v.push(ty.toVarType(map));
-      });
+      }
       return new FuncType(...v);
     }
     return this;
@@ -218,7 +218,7 @@ class ListType extends Type {
   public psize() {
     return 1;
   }
-  public ptype(_index: number) {
+  public ptype(index: number) {
     return this.param;
   }
 
@@ -285,9 +285,11 @@ class UnionType extends Type {
     return this.types[index];
   }
 
-  public accept(ty: Type, _update: boolean): boolean {
-    if (this.types.some(ty0 => ty0.accept(ty, false))) {
-      return true;
+  public accept(ty: Type, update: boolean): boolean {
+    for (const ty0 of this.types) {
+      if (ty0.accept(ty, false)) {
+        return true;
+      }
     }
     console.log(`FAIL ${ty} ${this.toString()}`);
     return false;
@@ -298,8 +300,10 @@ class UnionType extends Type {
   }
 
   public hasAlpha(): boolean {
-    if (this.types.some(ty => ty.hasAlpha())) {
-      return true;
+    for (const ty of this.types) {
+      if (ty.hasAlpha()) {
+        return true;
+      }
     }
     return false;
   }
@@ -307,9 +311,9 @@ class UnionType extends Type {
   public toVarType(map: any) {
     if (this.hasAlpha()) {
       const ts: Type[] = [];
-      this.types.forEach(ty => {
+      for (const ty of this.types) {
         ts.push(ty.toVarType(map));
-      });
+      }
       return new UnionType(...ts);
     }
     return this;
@@ -329,7 +333,7 @@ const tBool = new BaseType('Bool');
 const tInt = new BaseType('Number');
 const tInt_ = new BaseType('Number', true);
 const tFloat = tInt;
-// const tFloat_ = tInt_;
+const tFloat_ = tInt_;
 const tString = new BaseType('String');
 const tString_ = new BaseType('String', true);
 const tA = new BaseType('a');
@@ -337,7 +341,7 @@ const tListA = new ListType(tA);
 const tListInt = new ListType(tInt);
 const tListAny = new ListType(tAny);
 const tMatter = new BaseType('Object');
-// const tObject = tMatter;
+const tObject = tMatter;
 const tVec = new BaseType('Vec');
 
 //const tUndefined = new BaseType('undefined');
@@ -346,22 +350,22 @@ const EmptyNumberSet: number[] = [];
 
 const unionSet = (a: number[], b: number[], c?: number[]) => {
   const A: number[] = [];
-  a.forEach(id => {
+  for (const id of a) {
     if (A.indexOf(id) === -1) {
       A.push(id);
     }
-  });
-  b.forEach(id => {
+  }
+  for (const id of b) {
     if (A.indexOf(id) === -1) {
       A.push(id);
     }
-  });
+  }
   if (c !== undefined) {
-    b.forEach(id => {
+    for (const id of b) {
       if (A.indexOf(id) === -1) {
         A.push(id);
       }
-    });
+    }
   }
   return A;
 };
@@ -369,14 +373,14 @@ const unionSet = (a: number[], b: number[], c?: number[]) => {
 class VarType extends Type {
   private varMap: (Type | number[])[];
   private varid: number;
-  private _ref: ParseTree | null;
+  private ref: ParseTree | null;
 
   constructor(env: Env, ref: ParseTree) {
     super(false);
     this.varMap = env.getroot('@varmap');
     this.varid = this.varMap.length;
     this.varMap.push(EmptyNumberSet);
-    this._ref = ref;
+    this.ref = ref;
   }
 
   public toString() {
@@ -412,16 +416,16 @@ class VarType extends Type {
           this.varMap[v1.varid] as number[],
           [v1.varid, this.varid]
         );
-        u.forEach(id => {
+        for (const id of u) {
           this.varMap[id] = u;
-        });
+        }
         return true;
       }
       if (!v1.isPattern()) {
         const u = this.varMap[this.varid] as number[];
-        u.forEach(id => {
+        for (const id of u) {
           this.varMap[id] = v1;
-        });
+        }
         this.varMap[this.varid] = v1;
       }
     }
@@ -452,7 +456,7 @@ class OptionType extends Type {
     return false;
   }
 
-  public equals(ty: Type, _update: boolean): boolean {
+  public equals(ty: Type, update: boolean): boolean {
     return this.accept(ty);
   }
 
@@ -464,7 +468,7 @@ class OptionType extends Type {
     return false;
   }
 
-  public toVarType(_map: any) {
+  public toVarType(map: any) {
     return this;
   }
 }
@@ -519,7 +523,7 @@ const import_python = {
   //# 返値, 引数..None はなんでもいい
   len: new Symbol('lib.len', new FuncType(tInt, union(tString, tListA))),
   //可変長引数
-  range: new Symbol('puppy.range', new FuncType(tListInt, tInt, tInt_, tInt_)),
+  range: new Symbol('lib.range', new FuncType(tListInt, tInt, tInt_, tInt_)),
   //append
   '.append': new Symbol('lib.append', new FuncType(tVoid, tListA, tA)),
 
@@ -593,11 +597,11 @@ const modules: any = {
 const symbolPackageMap: any = {};
 
 const checkSymbolNames = () => {
-  Object.keys(modules).forEach(pkgname => {
-    Object.keys(modules[pkgname]).forEach(name => {
+  for (const pkgname of Object.keys(modules)) {
+    for (const name of Object.keys(modules[pkgname])) {
       symbolPackageMap[name] = pkgname;
-    });
-  });
+    }
+  }
 };
 checkSymbolNames();
 
@@ -706,7 +710,7 @@ const tright = (op: string, ty: Type) => {
   return ty; // 左と同じ型
 };
 
-export type ErrorLog = {
+type ErrorLog = {
   type?: string;
   key: string;
   pos?: number;
@@ -787,12 +791,12 @@ class Env {
   }
 
   public from_import(pkg: any, list?: string[]) {
-    Object.keys(pkg).forEach(name => {
+    for (const name of Object.keys(pkg)) {
       //console.log(name);
       if (list === undefined || list.indexOf(name) !== -1) {
         this.vars[name] = pkg[name];
       }
-    });
+    }
   }
 
   public setModule(name: string, options: any) {
@@ -874,7 +878,7 @@ class Env {
         data['isMatter'] = true;
       } else {
         const pos = setpos(t.inputs, t.spos, { type: '', key: '' });
-        this.setroot('@yield', pos.row);
+        this.setroot('@yeild', pos.row);
       }
     }
   }
@@ -915,10 +919,10 @@ class Env {
   }
 
   public emitAutoYield(out: string[]) {
-    const yieldparam = this.getroot('@yield');
+    const yieldparam = this.getroot('@yeild');
     if (yieldparam !== undefined && !this.inFunc()) {
       out.push(`; yield ${yieldparam};\n`);
-      this.setroot('@yield', undefined);
+      this.setroot('@yeild', undefined);
     } else {
       out.push('\n');
     }
@@ -929,11 +933,16 @@ class PuppyError {
   public constructor() {}
 }
 
+const FIXME_subs = (t: any) => {
+  return t instanceof ParseTree ? t.subs() : ([] as ParseTree[]);
+};
+
 class Transpiler {
   public constructor() {}
 
   public conv(env: Env, t: ParseTree, out: string[]) {
-    //console.log(t.toString());
+    // console.log(t.toString());
+    // console.log((this as any)[t.tag]);
     try {
       return (this as any)[t.tag](env, t, out);
     } catch (e) {
@@ -953,7 +962,7 @@ class Transpiler {
     }
   }
 
-  public skip(_env: Env, _t: ParseTree, _out: string[]): Type {
+  public skip(env: Env, t: ParseTree, out: string[]): Type {
     throw new PuppyError();
     // out.push('undefined');
     // return tAny;
@@ -1049,7 +1058,7 @@ class Transpiler {
     return this.skip(env, t, out);
   }
 
-  public err(env: Env, t: ParseTree, _out: string[]) {
+  public err(env: Env, t: ParseTree, out: string[]) {
     env.perror(t, {
       type: 'error',
       key: 'SyntaxError',
@@ -1087,7 +1096,7 @@ class Transpiler {
   }
 
   public Source(env: Env, t: ParseTree, out: string[]) {
-    t.subs().forEach(subtree => {
+    for (const subtree of FIXME_subs(t)) {
       try {
         const out2: string[] = [];
         out2.push(env.get('@indent'));
@@ -1099,7 +1108,7 @@ class Transpiler {
           throw e;
         }
       }
-    });
+    }
     return tVoid;
   }
 
@@ -1109,11 +1118,11 @@ class Transpiler {
     const env = new Env(penv);
     env.set('@indent', nested);
     out.push('{\n');
-    t.subs().forEach(subtree => {
+    for (const subtree of FIXME_subs(t)) {
       out.push(env.get('@indent'));
       this.conv(env, subtree, out);
       env.emitAutoYield(out);
-    });
+    }
     out.push(indent + '}');
     return tVoid;
   }
@@ -1134,6 +1143,11 @@ class Transpiler {
     this.check(tBool, env, t['cond'], out);
     out.push(') ');
     this.conv(env, t['then'], out);
+    if (t['elif'] !== undefined) {
+      for (const stmt of t['elif'].subs()) {
+        this.conv(env, stmt, out);
+      }
+    }
     if (t['else'] !== undefined) {
       out.push('else ');
       this.conv(env, t['else'], out);
@@ -1141,11 +1155,18 @@ class Transpiler {
     return tVoid;
   }
 
+  public ElifStmt(env: Env, t: any, out: string[]) {
+    out.push('else if (');
+    this.check(tBool, env, t['cond'], out);
+    out.push(') ');
+    this.conv(env, t['then'], out);
+    return tVoid;
+  }
+
   public ForStmt(env: Env, t: any, out: string[]) {
     // if (t['each'].tag !== 'Name') {
     //   env.perror(t['each'], {
-    //     type: 'error',
-    //     key: 'RequiredIdentifier',
+    //     type: 'error', key: 'RequiredIdentifier',
     //   });
     //   return tVoid;
     // }
@@ -1200,13 +1221,13 @@ class Transpiler {
       return: types[0],
       hasReturn: false,
     });
-    t['params'].subs().forEach(p => {
+    for (const p of t['params'].subs()) {
       const pname = p.tokenize('name');
       const ptype = new VarType(env, p['name']);
       const symbol = lenv.declVar(pname, ptype);
       names.push(symbol.code);
       types.push(ptype);
-    });
+    }
     const funcType = new FuncType(...types);
     out.push(`(${names.join(', ')}) => `);
     this.conv(lenv, t['body'], out);
@@ -1262,7 +1283,7 @@ class Transpiler {
     return tVoid;
   }
 
-  public Pass(_env: Env, _t: any, _out: string[]) {
+  public Pass(env: Env, t: any, out: string[]) {
     return tVoid;
   }
 
@@ -1550,10 +1571,10 @@ class Transpiler {
 
   public Data(env: Env, t: ParseTree, out: string[]) {
     out.push('{');
-    t.subs().forEach(sub => {
+    for (const sub of FIXME_subs(t)) {
       this.conv(env, sub, out);
       out.push(',');
-    });
+    }
     out.push('}');
     return tOption;
   }
@@ -1576,7 +1597,7 @@ class Transpiler {
   }
 
   public Tuple(env: Env, t: ParseTree, out: string[]) {
-    const subs = t.subs();
+    const subs = FIXME_subs(t);
     if (subs.length > 2) {
       env.perror(t, {
         type: 'warning',
@@ -1601,13 +1622,13 @@ class Transpiler {
   public List(env: Env, t: ParseTree, out: string[]) {
     var ty = new VarType(env, t);
     out.push('[');
-    t.subs().forEach(sub => {
+    for (const sub of FIXME_subs(t)) {
       ty = this.check(ty, env, sub, out, {
         type: 'error',
         key: 'AllTypeAsSame', //全ての要素を同じ型に揃えてください
       });
       out.push(',');
-    });
+    }
     out.push(']');
     return new ListType(ty);
   }
@@ -1615,7 +1636,7 @@ class Transpiler {
   public Format(env: Env, t: ParseTree, out: string[]) {
     var c = 0;
     out.push('(');
-    t.subs().forEach(e => {
+    for (const e of FIXME_subs(t)) {
       if (c > 0) {
         out.push('+');
       }
@@ -1631,7 +1652,7 @@ class Transpiler {
         }
       }
       c++;
-    });
+    }
     out.push(')');
     return tString;
   }
@@ -1679,7 +1700,7 @@ class Transpiler {
 
 const parser = generate('Source');
 
-export const transpile = (s: string) => {
+const transpile = (s: string) => {
   const t = parser(s);
   const env = new Env();
   env.from_import(import_python);
@@ -1723,7 +1744,6 @@ ${jscode}
 }`;
   var code: any = {};
   try {
-    console.log(main);
     code = new Function(main)();
   } catch (e) {
     env.perror(t, {
@@ -1762,12 +1782,26 @@ export const utest = (s: string) => {
 // '''
 // `));
 
-// console.log(transpile(`
-// def fibo(n):
-// 	if n < 3:
-// 	  return 1
-// 	return fibo(n-1)+fibo(n-2)
-// `));
+console.log(
+  transpile(`
+if True :
+  1
+elif True :
+  2
+elif True :
+  3
+else :
+  4
+`)
+);
+
+console.log(
+  transpile(`
+for x in range(1,2):
+  for y in range(x,2):
+    x+y
+`)
+);
 
 // console.log(transpile(`
 // def f(x,y):

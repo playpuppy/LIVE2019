@@ -47,7 +47,7 @@ export class ParseTree {
     return this.tag === 'err';
   }
 
-  public subs() {
+  public subs(): ParseTree[] {
     const subs: ParseTree[] = [];
     for (var i = 0; i < this.nodes.length; i += 1) {
       subs.push(this.nodes[i][1]);
@@ -168,11 +168,11 @@ class ParserContext {
   }
 }
 
-const EMPTY = (_px: ParserContext) => {
+const EMPTY = (px: ParserContext) => {
   return true;
 };
 
-const _pEmpty = () => {
+const pEmpty = () => {
   return EMPTY;
 };
 
@@ -446,7 +446,7 @@ const pFold = (
   };
 };
 
-const _pAbs = (match: (px: ParserContext) => boolean) => {
+const pAbs = (match: (px: ParserContext) => boolean) => {
   return (px: ParserContext) => {
     const ast = px.ast;
     if (match(px)) {
@@ -457,7 +457,7 @@ const _pAbs = (match: (px: ParserContext) => boolean) => {
   };
 };
 
-const _pSkipErr = () => {
+const pSkipErr = () => {
   return (px: ParserContext) => {
     px.pos = Math.min(px.head_pos, px.epos);
     return true;
@@ -496,7 +496,7 @@ const pSymbol = (sid: number, match: (px: ParserContext) => boolean) => {
   };
 };
 
-const _pExists = (sid: number) => {
+const pExists = (sid: number) => {
   return (px: ParserContext) => {
     return getstate(px.state, sid) !== null;
   };
@@ -766,6 +766,7 @@ const grammar = (start: string) => {
         pChar(':'),
         pRef(peg, '_'),
         pEdge('then', pOre2(pRef(peg, 'Block'), pRef(peg, 'Statement'))),
+        pOption(pEdge('elif', pRef(peg, 'ElifBlock'))),
         pOption(
           pSeq(
             pOre2(pMatch(0), pRef(peg, 'NL')),
@@ -778,6 +779,20 @@ const grammar = (start: string) => {
         )
       ),
       'IfStmt',
+      0
+    );
+    peg['ElifBlock'] = pNode(pMany1(pEdge('', pRef(peg, 'ElifStmt'))), '', 0);
+    peg['ElifStmt'] = pNode(
+      pSeq(
+        pOre2(pMatch(0), pRef(peg, 'NL')),
+        pSeq2(pChar('elif'), pRef(peg, 'S')),
+        pRef(peg, '_'),
+        pEdge('cond', pRef(peg, 'Expression')),
+        pChar(':'),
+        pRef(peg, '_'),
+        pEdge('then', pOre2(pRef(peg, 'Block'), pRef(peg, 'Statement')))
+      ),
+      'ElifStmt',
       0
     );
     peg['ForStmt'] = pNode(
@@ -1505,7 +1520,7 @@ const grammar = (start: string) => {
   return peg[start];
 };
 
-const _example = (start: string, sample?: string) => {
+const example = (start: string, sample?: string) => {
   const parser = generate(start);
   const t = parser(sample || 'abc');
   console.log(`${start} ${sample}`);
@@ -1520,11 +1535,8 @@ const _example = (start: string, sample?: string) => {
 // example('Lambda','lambda: print(1)')
 // example('Lambda','lambda x: print(x)')
 // example('Lambda','lambda x,y: print(x,y)')
-// example('IfStmt','if A == 1 :\n    print(A)\n    #hoge\n    print(A, B)\n    A = Ball(跳ね返る)\nelse:\n    print(A, B)\n\n    A = 2\n')
 // example('Statement','if A == 1 :\n    print(A)\n    #hoge\n    print(A, B)\n    A = Ball(跳ね返る)\nelse:\n    print(A, B)\n\n    A = 2\n')
-// example('IfStmt','if A == 1 :\n    print(A)\nelse:\n    print(A, B)\n')
-// example('Statement','if A == 1 :\n    print(A)\nelse:\n    print(A, B)\n')
-// example('ForStmt','for x in [1,2,3]:\n    print(x)\n    print(x+1)\n')
+// example('Statement','if A :\n    pass\nelif B :\n    pass\nelif C :\n    pass\nelse :\n    pass\n')
 // example('Statement','for x in [1,2,3]:\n    print(x)\n    print(x+1)\n')
 // example('VarDecl','A = 1')
 // example('Statement','A = 1')

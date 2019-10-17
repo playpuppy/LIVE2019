@@ -9,6 +9,7 @@ import {
   getIsLive,
 } from '../modules/operations';
 import { chooseColorScheme } from './color';
+import { Lib } from '../puppy-transpiler/puppy-lib';
 
 // const Bodies = Matter.Bodies;
 const Engine = Matter.Engine;
@@ -141,6 +142,7 @@ export class Puppy {
   // private debug_mode: boolean;
 
   private vars: {};
+  private lib: Lib;
 
   // new puppy
   public constructor(settings: PuppySettings, code: any, waitStart = false) {
@@ -155,6 +157,11 @@ export class Puppy {
     this.render = null;
     this.canvas = null;
     this.vars = {};
+    this.lib = new Lib({
+      Body: Matter.Body,
+      Composite: Matter.Composite,
+      Constraint: Matter.Constraint,
+    });
   }
 
   private initCode() {
