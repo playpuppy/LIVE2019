@@ -537,19 +537,19 @@ export class Puppy {
     return body;
   };
 
-  public Circle = (x: number, y: number, options: Shape) => {
+  public Circle = (x: number, y: number, options = {}) => {
     return this.new_(this.vars['Circle'], x, y, options);
   };
 
-  public Rectangle = (x: number, y: number, options: Shape) => {
+  public Rectangle = (x: number, y: number, options = {}) => {
     return this.new_(this.vars['Rectangle'], x, y, options);
   };
 
-  public Polygon = (x: number, y: number, options: Shape) => {
+  public Polygon = (x: number, y: number, options = {}) => {
     return this.new_(this.vars['Polygon'], x, y, options);
   };
 
-  public Label = (x: number, y: number, options: Shape) => {
+  public Label = (x: number, y: number, options = {}) => {
     return this.new_(this.vars['Label'], x, y, options);
   };
 
