@@ -6,7 +6,7 @@ def FizzBuzz(n):
   elif (n % 3 == 0):
     print("Fizz")
   else:
-    print(i)
+    print(n)
 
 N = 30
 for i in range(1, N+1):
