@@ -49,7 +49,7 @@ const PuppyFooter: React.FC<PuppyFooterProps> = (props: PuppyFooterProps) => {
         <FontAwesomeIcon icon={faExpand} />
       </Button>
       <Button onClick={() => props.setIsCourseVisible(!props.isCourseVisible)}>
-        <FontAwesomeIcon icon={props.isCourseVisible ? faBook : faBookOpen} />
+        <FontAwesomeIcon icon={props.isCourseVisible ? faBookOpen : faBook} />
       </Button>
     </div>
   );
