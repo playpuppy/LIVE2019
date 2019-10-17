@@ -182,7 +182,7 @@ const initialState: EditorState = {
   code: '',
   codeEditor: null,
   theme: 'vs',
-  fontSize: 30,
+  fontSize: 24,
   decoration: [],
   markers: [],
   diffStartLineNumber: null,
