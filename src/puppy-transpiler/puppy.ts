@@ -555,6 +555,8 @@ const import_random = {
 };
 
 const import_matterjs = {
+  // # 時間
+  getTime: new Symbol('puppy.getTimeStamp.bind(puppy)', new FuncType(tInt)),
   // # クラス
   World: new Symbol('puppy.World', tFuncShape, { isMatter: true }),
   Circle: new Symbol('puppy.Circle', tFuncShape, { isMatter: true }),

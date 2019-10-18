@@ -478,7 +478,7 @@ export class Puppy {
   }
 
   public getTimeStamp() {
-    return this.engine!.timing.timestamp;
+    return this.engine ? this.engine.timing.timestamp : 0;
   }
 
   // lives
