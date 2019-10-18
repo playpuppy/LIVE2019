@@ -76,7 +76,10 @@ const PuppyScreen: React.FC<PuppyScreenProps> = (props: PuppyScreenProps) => {
 
   return (
     <>
-      <div id="puppy-screen"></div>
+      <div
+        id="puppy-screen"
+        onClick={() => props.setIsCourseVisible(false)}
+      ></div>
       <PuppyFooter
         isCourseVisible={props.isCourseVisible}
         setIsCourseVisible={props.setIsCourseVisible}
