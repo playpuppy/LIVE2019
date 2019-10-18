@@ -15,7 +15,105 @@ monacoEditor.editor.defineTheme('error', {
   inherit: true,
   rules: [],
   colors: {
-    'editor.background': '#ffb7b7',
+    'editor.background': '#ffEEEE',
+  },
+});
+
+monacoEditor.languages.registerCompletionItemProvider('python', {
+  provideCompletionItems: (
+    model: monacoEditor.editor.ITextModel,
+    position: monacoEditor.Position,
+    context: monacoEditor.languages.CompletionContext,
+    _token
+  ) => {
+    const wordInfo = model.getWordUntilPosition(position);
+    const range = new monacoEditor.Range(
+      position.lineNumber,
+      wordInfo.startColumn,
+      position.lineNumber,
+      wordInfo.endColumn
+    );
+    const math = [
+      'pi',
+      'sin',
+      'cos',
+      'tan',
+      'sqrt',
+      'log',
+      'log10',
+      'pow',
+      'hypot',
+      'gcd',
+    ];
+    const python = ['input', 'print', 'len', 'range', 'int', 'float', 'str'];
+    const random = ['random'];
+    const matter = ['World', 'Circle', 'Rectangle', 'Polygon', 'Label'];
+    const parameters = [
+      'width',
+      'height',
+      'isStatic',
+      'restitution',
+      'fillStyle',
+      'image',
+      'strokeStyle',
+      'lineWidth',
+    ];
+
+    const suggestions: monacoEditor.languages.CompletionItem[] = [];
+
+    math.map(label => {
+      suggestions.push({
+        label,
+        kind: monacoEditor.languages.CompletionItemKind.Function,
+        insertText: `${label}(\${1})`,
+        insertTextRules:
+          monacoEditor.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        range,
+      });
+    });
+
+    python.map(label => {
+      suggestions.push({
+        label,
+        kind: monacoEditor.languages.CompletionItemKind.Function,
+        insertText: `${label}(\${1})`,
+        insertTextRules:
+          monacoEditor.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        range,
+      });
+    });
+
+    random.map(label => {
+      suggestions.push({
+        label,
+        kind: monacoEditor.languages.CompletionItemKind.Function,
+        insertText: `${label}(\${1})`,
+        insertTextRules:
+          monacoEditor.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        range,
+      });
+    });
+
+    matter.map(label => {
+      suggestions.push({
+        label,
+        kind: monacoEditor.languages.CompletionItemKind.Constructor,
+        insertText: `${label}(\${1})`,
+        insertTextRules:
+          monacoEditor.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        range,
+      });
+    });
+
+    parameters.map(label => {
+      suggestions.push({
+        label,
+        kind: monacoEditor.languages.CompletionItemKind.Property,
+        insertText: `${label}=`,
+        range,
+      });
+    });
+    return { suggestions: suggestions };
   },
 });
 
