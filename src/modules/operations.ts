@@ -1,6 +1,6 @@
 import { setTheme, setCode, setMarker, setDecoration } from './editor';
 import { CourseShape, setCourse, setContent, setCources } from './course';
-import { setPuppy } from './puppy';
+import { setPuppy, setShowTLIcon } from './puppy';
 import { setPlaceholder, setShow } from './input';
 import { PuppyCode, Puppy, runPuppy, ErrorLog } from '../vm/vm';
 import store, { ReduxActions } from '../store';
@@ -182,6 +182,8 @@ export const getInputValue = async (msg: string) => {
 };
 
 export const getIsLive = () => store.getState().puppy.isLive;
+
+export const showTimeLeapIcon = () => store.dispatch(setShowTLIcon(true));
 
 export const getDiffStartLineNumber = () => {
   const num = store.getState().editor.diffStartLineNumber;

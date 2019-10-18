@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Puppy } from '../../vm/vm';
 import { Button } from 'react-bootstrap';
 import './PuppyScreen.css';
@@ -8,7 +8,9 @@ import {
   faExpand,
   faBookOpen,
   faBook,
+  faAngleDoubleRight,
 } from '@fortawesome/free-solid-svg-icons';
+import { CSSTransition } from 'react-transition-group';
 
 type PuppyFooterProps = {
   isCourseVisible: boolean;
@@ -57,6 +59,8 @@ const PuppyFooter: React.FC<PuppyFooterProps> = (props: PuppyFooterProps) => {
 
 export type PuppyScreenProps = PuppyFooterProps & {
   setSize: (width: number, height: number) => void;
+  setShowTLIcon: (showTLIcon) => void;
+  showTLIcon: boolean;
 };
 
 let timer: NodeJS.Timeout | null = null;
@@ -74,12 +78,33 @@ const PuppyScreen: React.FC<PuppyScreenProps> = (props: PuppyScreenProps) => {
     }, 300);
   });
 
+  const get_color = (puppy: Puppy | null) => {
+    if (puppy && puppy.world) {
+      return puppy.world.colorScheme[0];
+    }
+    return 'gray';
+  };
+
   return (
     <>
       <div
         id="puppy-screen"
         onClick={() => props.setIsCourseVisible(false)}
       ></div>
+      <CSSTransition
+        in={props.showTLIcon}
+        timeout={{
+          enter: 0,
+          exit: 500,
+        }}
+        className="time-leap"
+        unmountOnExit
+        onEntered={() => props.setShowTLIcon(false)}
+      >
+        <div style={{ background: get_color(props.puppy) }}>
+          <FontAwesomeIcon icon={faAngleDoubleRight} />
+        </div>
+      </CSSTransition>
       <PuppyFooter
         isCourseVisible={props.isCourseVisible}
         setIsCourseVisible={props.setIsCourseVisible}

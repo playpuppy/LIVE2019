@@ -1,3 +1,36 @@
+.time-leap {
+  position: relative;
+  bottom: 70vh;
+  left: 17vw;
+  font-size: 9vw;
+  text-align: center;
+  background: gray;
+  color: white;
+  border-radius: 50%;
+  width: 14vw;
+  height: 14vw;
+}
+
+.time-leap.enter {
+  opacity: 1;
+  transform: scale(0.5);
+}
+.time-leap.enter-active {
+  opacity: 1;
+  transform: scale(0.5);
+}
+
+.time-leap.exit {
+  opacity: 1;
+  transform: scale(0.5);
+}
+
+.time-leap.exit-active {
+  opacity: 0;
+  transform: scale(1);
+  transition: opacity 500ms, transform 500ms ease-in;
+}
+
 #puppy-footer {
   position: absolute;
   width: 100%;

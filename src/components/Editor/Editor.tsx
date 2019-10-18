@@ -314,7 +314,7 @@ const Editor: React.FC<EditorProps> = (props: EditorProps) => {
           `/api/sample/${props.coursePath}/${props.page}`,
           new_code
         );
-      }, 100);
+      }, 300);
     }
   };
   const hoge: string = 'piyo';

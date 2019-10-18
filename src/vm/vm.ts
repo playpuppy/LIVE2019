@@ -7,6 +7,7 @@ import {
   setCodeHighlight,
   resetCodeHighlight,
   getIsLive,
+  showTimeLeapIcon,
 } from '../modules/operations';
 import { chooseColorScheme } from './color';
 import { Lib } from '../puppy-transpiler/puppy-lib';
@@ -377,10 +378,10 @@ export class Puppy {
     this.isExecuting = true;
     for await (const lineNumber of this.code.main(this)) {
       if (this.isDisposed) {
-        console.log('stop');
         break;
       }
       if (lineNumber < diffStartLineNumber && getIsLive()) {
+        showTimeLeapIcon();
         for (let i = 0; i < this.interval / this.runner!.delta; i += 1) {
           this.engine = Engine.update(this.engine!, undefined, undefined);
         }
