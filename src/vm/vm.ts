@@ -89,6 +89,7 @@ export class Puppy {
   public interval: number;
   public waitRestart: boolean;
   public isExecuting: boolean;
+  private isDisposed: boolean;
 
   private runner: Matter.Runner | null;
   private engine: Matter.Engine | null;
@@ -108,6 +109,7 @@ export class Puppy {
     this.interval = 500;
     this.waitRestart = waitStart;
     this.isExecuting = false;
+    this.isDisposed = false;
     this.runner = null;
     this.engine = null;
     this.render = null;
@@ -331,6 +333,7 @@ export class Puppy {
       // this.render!.context = null;
       this.render.textures = {};
     }
+    this.isDisposed = true;
   }
 
   // private DefaultRenderOptions: () => Matter.IRenderDefinition;
@@ -373,6 +376,10 @@ export class Puppy {
     const diffStartLineNumber = getDiffStartLineNumber();
     this.isExecuting = true;
     for await (const lineNumber of this.code.main(this)) {
+      if (this.isDisposed) {
+        console.log('stop');
+        break;
+      }
       if (lineNumber < diffStartLineNumber && getIsLive()) {
         for (let i = 0; i < this.interval / this.runner!.delta; i += 1) {
           this.engine = Engine.update(this.engine!, undefined, undefined);
@@ -380,7 +387,9 @@ export class Puppy {
       } else {
         setCodeHighlight(lineNumber, lineNumber);
         await this.waitForRun(1000);
-        await this.wait(this.interval);
+        await this.wait(this.interval / 2);
+        resetCodeHighlight();
+        await this.wait(this.interval / 2);
       }
     }
     this.isExecuting = false;
@@ -417,7 +426,7 @@ export class Puppy {
 
   public runCode() {
     this.initCode();
-    this.dispose();
+    // this.dispose();
     this.startCode();
     this.runner!.enabled = !this.waitRestart;
     this.execute_main();
