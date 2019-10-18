@@ -19,6 +19,42 @@ monacoEditor.editor.defineTheme('error', {
   },
 });
 
+// monacoEditor.languages.registerCodeActionProvider('python', {
+//   provideCodeActions: (
+//     model: monacoEditor.editor.ITextModel,
+//     range: monacoEditor.Range,
+//     context: monacoEditor.languages.CodeActionContext,
+//     token: monacoEditor.CancellationToken
+//   ) => {
+//     console.log(context);
+//     const workSpaceEdit: monacoEditor.languages.WorkspaceEdit = {
+//       edits: [
+//         {
+//           edits: [
+//             {
+//               range,
+//               text: 'test',
+//             },
+//           ],
+//           resource: model.uri,
+//         },
+//       ],
+//     };
+//     const codeActions: monacoEditor.languages.CodeAction[] = [
+//       {
+//         title: 'Test',
+//         edit: workSpaceEdit,
+//         command: { id: '001', title: 'test' },
+//         diagnostics: [],
+//         kind: 'quickfix',
+//         isPreferred: true,
+//       },
+//     ];
+//     console.log(codeActions);
+//     return codeActions;
+//   },
+// });
+
 monacoEditor.languages.registerCompletionItemProvider('python', {
   provideCompletionItems: (
     model: monacoEditor.editor.ITextModel,
@@ -198,6 +234,7 @@ const Editor: React.FC<EditorProps> = (props: EditorProps) => {
     selectOnLineNumbers: true,
     fontSize: props.fontSize,
     wordWrap: 'on' as 'on',
+    lightbulb: { enabled: true },
   };
 
   addEventListener('resize', () => {

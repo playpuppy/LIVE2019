@@ -2,6 +2,7 @@ import { Action } from 'redux';
 import * as monacoEditor from 'monaco-editor';
 export type CodeEditor = monacoEditor.editor.IStandaloneCodeEditor;
 import { ErrorLog } from '../vm/vm';
+import { enMessage } from '../puppy-transpiler/puppy-message';
 
 enum EditorActionTypes {
   SET_SIZE = 'SET_SIZE',
@@ -121,7 +122,7 @@ export const setMarker = (markers: ErrorLog[]): SetMarkerAction => ({
       startColumn: marker.col!,
       endLineNumber: marker.row! + 1,
       endColumn: marker.col! + marker.len!,
-      message: marker.key,
+      message: enMessage[marker.key](marker),
     })),
   },
 });

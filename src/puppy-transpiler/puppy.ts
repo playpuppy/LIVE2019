@@ -5,7 +5,7 @@ const MUST = '';
 
 /* Type System */
 
-class Type {
+export class Type {
   protected code: string;
   public constructor(code: string) {
     this.code = code;
@@ -746,7 +746,7 @@ const tright = (op: string, ty: Type) => {
   return ty; // 左と同じ型
 };
 
-type ErrorLog = {
+export type ErrorLog = {
   type?: string;
   key: string;
   pos?: number;

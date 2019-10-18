@@ -10,6 +10,7 @@ import {
 } from '../modules/operations';
 import { chooseColorScheme } from './color';
 import { Lib } from '../puppy-transpiler/puppy-lib';
+import { Type } from '../puppy-transpiler/puppy';
 
 // const Bodies = Matter.Bodies;
 const Engine = Matter.Engine;
@@ -51,51 +52,6 @@ export type ErrorLog = {
   request?: Type;
   given?: Type;
 };
-
-class Type {
-  public isOptional: boolean;
-  public constructor(isOptional: boolean) {
-    this.isOptional = isOptional;
-  }
-
-  public toString() {
-    return '?';
-  }
-
-  public rtype(): Type {
-    return this;
-  }
-  public psize() {
-    return 0;
-  }
-  public ptype(_index: number): Type {
-    return this;
-  }
-
-  // public equals(ty: Type, update: boolean): boolean {
-  //   return false;
-  // }
-
-  public accept(_ty: Type, _update: boolean): boolean {
-    return false;
-  }
-
-  public realType(): Type {
-    return this;
-  }
-
-  public isPattern() {
-    return false;
-  }
-
-  public hasAlpha(): boolean {
-    return false;
-  }
-
-  public toVarType(_map: any): Type {
-    return this;
-  }
-}
 
 export type PuppySettings = {
   canvas: string;
