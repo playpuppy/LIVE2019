@@ -157,7 +157,7 @@ export class Puppy {
     this.render = null;
     this.canvas = null;
     this.vars = {};
-    this.lib = new Lib({
+    this.lib = new Lib(this, {
       Body: Matter.Body,
       Composite: Matter.Composite,
       Constraint: Matter.Constraint,
