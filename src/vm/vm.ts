@@ -381,7 +381,7 @@ export class Puppy {
         break;
       }
       if (lineNumber < diffStartLineNumber && getIsLive()) {
-        showTimeLeapIcon();
+        await showTimeLeapIcon();
         for (let i = 0; i < this.interval / this.runner!.delta; i += 1) {
           this.engine = Engine.update(this.engine!, undefined, undefined);
         }

@@ -183,7 +183,8 @@ export const getInputValue = async (msg: string) => {
 
 export const getIsLive = () => store.getState().puppy.isLive;
 
-export const showTimeLeapIcon = () => store.dispatch(setShowTLIcon(true));
+export const showTimeLeapIcon = () =>
+  new Promise(resolve => resolve(store.dispatch(setShowTLIcon(true))));
 
 export const getDiffStartLineNumber = () => {
   const num = store.getState().editor.diffStartLineNumber;
@@ -216,7 +217,7 @@ export const fetchCourses = (
 ) => (): void => {
   const courses: { [path: string]: CourseShape } = {};
   const get_course: Promise<void>[] = [];
-  ['Puppy', 'PuppyCourse', 'LIVE2019'].forEach(path => {
+  ['LIVE2019'].forEach(path => {
     get_course.push(
       loadFile(`${PATH_PREFIX}/course/${path}/setting.json`)
         .then((s: string) => {
