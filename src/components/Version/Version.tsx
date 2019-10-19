@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
+import { puppy_version } from '../../puppy-transpiler/puppy';
 
 type VersionProps = {
   show: boolean;
@@ -11,19 +12,27 @@ const Version: React.FC<VersionProps> = (props: VersionProps) => {
     <>
       <Modal show={props.show} onHide={() => props.setShow(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
+          <Modal.Title>Puppy</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          {"Woohoo, you're reading this text in a modal!"}
+        <Modal.Body style={{ whiteSpace: 'pre-line' }}>
+          <p>{`Version: ${puppy_version()}`}</p>
+          <p>{'Browser: Google Chrome (OS X), Firefox'}</p>
+          <p>
+            If you find some bugs or suggestions, please send issues in{' '}
+            <a href="https://github.com/playpuppy/LIVE2019" target="blank">
+              {'GitHub'}
+            </a>
+            .
+          </p>
         </Modal.Body>
-        <Modal.Footer>
+        {/* <Modal.Footer>
           <Button variant="secondary" onClick={() => props.setShow(false)}>
             Close
           </Button>
           <Button variant="primary" onClick={() => props.setShow(false)}>
             Save Changes
           </Button>
-        </Modal.Footer>
+        </Modal.Footer> */}
       </Modal>
     </>
   );
