@@ -375,13 +375,17 @@ export class Puppy {
 
   public async execute_main() {
     const diffStartLineNumber = getDiffStartLineNumber();
+    let isTimeLeaped = false;
     this.isExecuting = true;
     for await (const lineNumber of this.code.main(this)) {
       if (this.isDisposed) {
         break;
       }
       if (lineNumber < diffStartLineNumber && getIsLive()) {
-        await showTimeLeapIcon();
+        if(!isTimeLeaped){
+          await showTimeLeapIcon();
+          isTimeLeaped = true;
+        }
         for (let i = 0; i < this.interval / this.runner!.delta; i += 1) {
           this.engine = Engine.update(this.engine!, undefined, undefined);
         }
