@@ -7,9 +7,11 @@ import {
   setCodeHighlight,
   resetCodeHighlight,
   getIsLive,
+  showTimeLeapIcon,
 } from '../modules/operations';
 import { chooseColorScheme } from './color';
 import { Lib } from '../puppy-transpiler/puppy-lib';
+import { Type } from '../puppy-transpiler/puppy';
 
 // const Bodies = Matter.Bodies;
 const Engine = Matter.Engine;
@@ -52,51 +54,6 @@ export type ErrorLog = {
   given?: Type;
 };
 
-class Type {
-  public isOptional: boolean;
-  public constructor(isOptional: boolean) {
-    this.isOptional = isOptional;
-  }
-
-  public toString() {
-    return '?';
-  }
-
-  public rtype(): Type {
-    return this;
-  }
-  public psize() {
-    return 0;
-  }
-  public ptype(_index: number): Type {
-    return this;
-  }
-
-  // public equals(ty: Type, update: boolean): boolean {
-  //   return false;
-  // }
-
-  public accept(_ty: Type, _update: boolean): boolean {
-    return false;
-  }
-
-  public realType(): Type {
-    return this;
-  }
-
-  public isPattern() {
-    return false;
-  }
-
-  public hasAlpha(): boolean {
-    return false;
-  }
-
-  public toVarType(_map: any): Type {
-    return this;
-  }
-}
-
 export type PuppySettings = {
   canvas: string;
   ftrace: (log: {}) => void;
@@ -133,6 +90,7 @@ export class Puppy {
   public interval: number;
   public waitRestart: boolean;
   public isExecuting: boolean;
+  private isDisposed: boolean;
 
   private runner: Matter.Runner | null;
   private engine: Matter.Engine | null;
@@ -152,12 +110,13 @@ export class Puppy {
     this.interval = 500;
     this.waitRestart = waitStart;
     this.isExecuting = false;
+    this.isDisposed = false;
     this.runner = null;
     this.engine = null;
     this.render = null;
     this.canvas = null;
     this.vars = {};
-    this.lib = new Lib({
+    this.lib = new Lib(this, {
       Body: Matter.Body,
       Composite: Matter.Composite,
       Constraint: Matter.Constraint,
@@ -375,6 +334,7 @@ export class Puppy {
       // this.render!.context = null;
       this.render.textures = {};
     }
+    this.isDisposed = true;
   }
 
   // private DefaultRenderOptions: () => Matter.IRenderDefinition;
@@ -415,16 +375,26 @@ export class Puppy {
 
   public async execute_main() {
     const diffStartLineNumber = getDiffStartLineNumber();
+    let isTimeLeaped = false;
     this.isExecuting = true;
     for await (const lineNumber of this.code.main(this)) {
+      if (this.isDisposed) {
+        break;
+      }
       if (lineNumber < diffStartLineNumber && getIsLive()) {
+        if(!isTimeLeaped){
+          await showTimeLeapIcon();
+          isTimeLeaped = true;
+        }
         for (let i = 0; i < this.interval / this.runner!.delta; i += 1) {
           this.engine = Engine.update(this.engine!, undefined, undefined);
         }
       } else {
         setCodeHighlight(lineNumber, lineNumber);
         await this.waitForRun(1000);
-        await this.wait(this.interval);
+        await this.wait(this.interval / 2);
+        resetCodeHighlight();
+        await this.wait(this.interval / 2);
       }
     }
     this.isExecuting = false;
@@ -461,7 +431,7 @@ export class Puppy {
 
   public runCode() {
     this.initCode();
-    this.dispose();
+    // this.dispose();
     this.startCode();
     this.runner!.enabled = !this.waitRestart;
     this.execute_main();
@@ -512,7 +482,7 @@ export class Puppy {
   }
 
   public getTimeStamp() {
-    return this.engine!.timing.timestamp;
+    return this.engine ? this.engine.timing.timestamp : 0;
   }
 
   // lives

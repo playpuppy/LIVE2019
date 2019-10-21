@@ -47,7 +47,7 @@ export class ParseTree {
     return this.tag === 'err';
   }
 
-  public subs(): ParseTree[] {
+  public subs() {
     const subs: ParseTree[] = [];
     for (var i = 0; i < this.nodes.length; i += 1) {
       subs.push(this.nodes[i][1]);
@@ -558,7 +558,14 @@ const grammar = (start: string) => {
     peg['Source'] = pSeq3(
       pOption(pRef(peg, 'EOL')),
       pNode(
-        pMany(pSeq2(pEdge('', pRef(peg, 'Statement')), pRef(peg, 'EOL'))),
+        pMany(
+          pSeq(
+            pEdge('', pRef(peg, 'Statement')),
+            pMany(pSeq2(pRef(peg, '";"'), pEdge('', pRef(peg, 'Statement')))),
+            pOption(pRef(peg, '";"')),
+            pRef(peg, 'EOL')
+          )
+        ),
         'Source',
         0
       ),
@@ -741,7 +748,7 @@ const grammar = (start: string) => {
         pChar('return'),
         pOption(
           pSeq3(
-            pRef(peg, 'S'),
+            pNot(pRef(peg, 'W')),
             pRef(peg, '_'),
             pEdge('expr', pRef(peg, 'Expression'))
           )
@@ -760,7 +767,7 @@ const grammar = (start: string) => {
     );
     peg['IfStmt'] = pNode(
       pSeq(
-        pSeq2(pChar('if'), pRef(peg, 'S')),
+        pSeq2(pChar('if'), pNot(pRef(peg, 'W'))),
         pRef(peg, '_'),
         pEdge('cond', pRef(peg, 'Expression')),
         pChar(':'),
@@ -771,6 +778,7 @@ const grammar = (start: string) => {
           pSeq(
             pOre2(pMatch(0), pRef(peg, 'NL')),
             pChar('else'),
+            pNot(pRef(peg, 'W')),
             pRef(peg, '_'),
             pChar(':'),
             pRef(peg, '_'),
@@ -785,7 +793,7 @@ const grammar = (start: string) => {
     peg['ElifStmt'] = pNode(
       pSeq(
         pOre2(pMatch(0), pRef(peg, 'NL')),
-        pSeq2(pChar('elif'), pRef(peg, 'S')),
+        pSeq2(pChar('elif'), pNot(pRef(peg, 'W'))),
         pRef(peg, '_'),
         pEdge('cond', pRef(peg, 'Expression')),
         pChar(':'),
@@ -797,10 +805,10 @@ const grammar = (start: string) => {
     );
     peg['ForStmt'] = pNode(
       pSeq(
-        pSeq2(pChar('for'), pRef(peg, 'S')),
+        pSeq2(pChar('for'), pNot(pRef(peg, 'W'))),
         pRef(peg, '_'),
         pEdge('each', pRef(peg, 'Name')),
-        pSeq2(pChar('in'), pRef(peg, 'S')),
+        pSeq2(pChar('in'), pNot(pRef(peg, 'W'))),
         pRef(peg, '_'),
         pEdge('list', pRef(peg, 'Expression')),
         pChar(':'),
@@ -812,7 +820,7 @@ const grammar = (start: string) => {
     );
     peg['WhileStmt'] = pNode(
       pSeq(
-        pSeq2(pChar('while'), pRef(peg, 'S')),
+        pSeq2(pChar('while'), pNot(pRef(peg, 'W'))),
         pRef(peg, '_'),
         pEdge('cond', pRef(peg, 'Expression')),
         pChar(':'),
@@ -841,11 +849,7 @@ const grammar = (start: string) => {
         pOre2(
           pFold(
             'recv',
-            pSeq3(
-              pRange('.', []),
-              pRef(peg, '_'),
-              pEdge('name', pRef(peg, 'Name'))
-            ),
+            pSeq3(pChar('.'), pRef(peg, '_'), pEdge('name', pRef(peg, 'Name'))),
             'GetExpr',
             0
           ),
@@ -895,9 +899,11 @@ const grammar = (start: string) => {
           'then',
           pSeq(
             pChar('if'),
+            pNot(pRef(peg, 'W')),
             pRef(peg, '_'),
             pEdge('cond', pRef(peg, 'Expression')),
             pChar('else'),
+            pNot(pRef(peg, 'W')),
             pRef(peg, '_'),
             pEdge('else', pRef(peg, 'Expression'))
           ),
@@ -921,7 +927,7 @@ const grammar = (start: string) => {
         )
       )
     );
-    peg['OR'] = pOre2(pChar('or'), pChar('||'));
+    peg['OR'] = pOre2(pSeq2(pChar('or'), pNot(pRef(peg, 'W'))), pChar('||'));
     peg['AndExpr'] = pSeq2(
       pRef(peg, 'NotExpr'),
       pMany(
@@ -937,7 +943,7 @@ const grammar = (start: string) => {
         )
       )
     );
-    peg['AND'] = pOre2(pChar('and'), pChar('&&'));
+    peg['AND'] = pOre2(pSeq2(pChar('and'), pNot(pRef(peg, 'W'))), pChar('&&'));
     peg['NotExpr'] = pOre2(
       pNode(
         pSeq3(
@@ -950,7 +956,10 @@ const grammar = (start: string) => {
       ),
       pRef(peg, 'EqExpr')
     );
-    peg['NOT'] = pOre2(pSeq2(pChar('not'), pRef(peg, 'S')), pChar('!'));
+    peg['NOT'] = pOre2(
+      pSeq3(pChar('not'), pNot(pRef(peg, 'W')), pRef(peg, '_')),
+      pChar('!')
+    );
     peg['EqExpr'] = pSeq2(
       pRef(peg, 'SumExpr'),
       pMany(
@@ -1062,11 +1071,7 @@ const grammar = (start: string) => {
           ),
           pFold(
             'recv',
-            pSeq3(
-              pRange('.', []),
-              pRef(peg, '_'),
-              pEdge('name', pRef(peg, 'Name'))
-            ),
+            pSeq3(pChar('.'), pRef(peg, '_'), pEdge('name', pRef(peg, 'Name'))),
             'GetExpr',
             0
           ),
@@ -1156,7 +1161,13 @@ const grammar = (start: string) => {
       pSeq(
         pRef(peg, '"("'),
         pEdge('', pRef(peg, 'Expression')),
-        pMany(pSeq2(pRef(peg, '","'), pEdge('', pRef(peg, 'Expression')))),
+        pMany(
+          pSeq3(
+            pRef(peg, '","'),
+            pRef(peg, '__'),
+            pEdge('', pRef(peg, 'Expression'))
+          )
+        ),
         pRef(peg, '__'),
         pRef(peg, '")"')
       ),
@@ -1169,10 +1180,16 @@ const grammar = (start: string) => {
         pOption(
           pSeq2(
             pEdge('', pRef(peg, 'Expression')),
-            pMany(pSeq2(pRef(peg, '","'), pEdge('', pRef(peg, 'Expression'))))
+            pMany(
+              pSeq3(
+                pRef(peg, '","'),
+                pRef(peg, '__'),
+                pEdge('', pRef(peg, 'Expression'))
+              )
+            )
           )
         ),
-        pMany(pRef(peg, '","')),
+        pOption(pRef(peg, '","')),
         pRef(peg, '__'),
         pRef(peg, '"]"')
       ),
@@ -1183,8 +1200,14 @@ const grammar = (start: string) => {
       pSeq(
         pRef(peg, '"{"'),
         pEdge('', pRef(peg, 'KeyValue')),
-        pMany(pSeq2(pMany(pRef(peg, '","')), pEdge('', pRef(peg, 'KeyValue')))),
-        pMany(pRef(peg, '","')),
+        pMany(
+          pSeq3(
+            pRef(peg, '","'),
+            pRef(peg, '__'),
+            pEdge('', pRef(peg, 'KeyValue'))
+          )
+        ),
+        pOption(pRef(peg, '","')),
         pRef(peg, '__'),
         pRef(peg, '"}"')
       ),
@@ -1209,11 +1232,7 @@ const grammar = (start: string) => {
     );
     peg['Name'] = pOre2(pRef(peg, 'Identifier'), pRef(peg, 'NLPSymbol'));
     peg['Identifier'] = pSeq2(
-      pNode(
-        pSeq2(pRange('', ['AZ', 'az']), pMany(pRange('_', ['AZ', 'az', '09']))),
-        'Name',
-        0
-      ),
+      pNode(pSeq2(pRange('', ['AZ', 'az']), pMany(pRef(peg, 'W'))), 'Name', 0),
       pRef(peg, '_')
     );
     peg['NLPSymbol'] = pSeq2(
@@ -1224,6 +1243,7 @@ const grammar = (start: string) => {
       ),
       pRef(peg, '_')
     );
+    peg['W'] = pRange('_', ['AZ', 'az', '09']);
     peg['Constant'] = pOre(
       pRef(peg, 'FormatString'),
       pRef(peg, 'LongString'),
@@ -1460,7 +1480,7 @@ const grammar = (start: string) => {
     );
     peg['EOF'] = pNot(pAny());
     peg['NL'] = pOre2(pChar('\n'), pRef(peg, 'EOF'));
-    peg['S'] = pRange(' \t\r\u3000、，', []);
+    peg['S'] = pRange(' \t\u200b\x0b\r\u3000', []);
     peg['_'] = pMany(
       pOre(pRef(peg, 'S'), pRef(peg, 'BLOCKCOMMENT'), pRef(peg, 'LINECOMMENT'))
     );
@@ -1499,8 +1519,7 @@ const grammar = (start: string) => {
     peg['HIRA'] = pRange('', ['ぁん']);
     peg['KATA'] = pRange('', ['ァヶ']);
     peg['KANJI'] = pRange('々〇〻ー', ['㐀䶵', '一龠']);
-    peg['MARK'] = pRange('ー', []);
-    peg['W'] = pRange('々〇〻ー', ['ァヶ', '㐀䶵', '一龠', 'ＡＺ']);
+    peg['MARK'] = pChar('ー');
     peg['"{"'] = pSeq2(pRange('{｛', []), pRef(peg, '__'));
     peg['"}"'] = pSeq2(pRange('}｝', []), pRef(peg, '_'));
     peg['"["'] = pSeq2(pRange('[［【', []), pRef(peg, '__'));
@@ -1526,40 +1545,6 @@ const example = (start: string, sample?: string) => {
   console.log(`${start} ${sample}`);
   console.log(t.toString());
 };
-
-// example('Source',"from puppy import *\ndef cat_clicked(cat): print('Meaw')\ncat = Circle(500, 500, clicked=cat_clicked)\n")
-// example('ClassDecl','class Ball(Circle):\n    width = 80\n    heigh = 80\n')
-// example('Statement','class Ball(Circle):\n    width = 80\n    heigh = 80\n')
-// example('FuncDecl','def succ(x):\n    #hoge\n    return x+1\n')
-// example('Statement','def succ(x):\n    #hoge\n    return x+1\n')
-// example('Lambda','lambda: print(1)')
-// example('Lambda','lambda x: print(x)')
-// example('Lambda','lambda x,y: print(x,y)')
-// example('Statement','if A == 1 :\n    print(A)\n    #hoge\n    print(A, B)\n    A = Ball(跳ね返る)\nelse:\n    print(A, B)\n\n    A = 2\n')
-// example('Statement','if A :\n    pass\nelif B :\n    pass\nelif C :\n    pass\nelse :\n    pass\n')
-// example('Statement','for x in [1,2,3]:\n    print(x)\n    print(x+1)\n')
-// example('VarDecl','A = 1')
-// example('Statement','A = 1')
-// example('VarDecl','A += 1')
-// example('Statement','A += 1')
-// example('Expression','not 1 == 2')
-// example('Expression','not 1 == 2 and 1 > 3')
-// example('Expression','a[1:2]')
-// example('Expression','a[1:]')
-// example('Expression','a[:2]')
-// example('Expression','Circle(500, 500)')
-// example('Expression','Circle(500, 500, clicked=cat_clicked)')
-// example('Expression','Circle(clicked=1, move=1)')
-// example('Primary','(1,2) //')
-// example('Expression','(1,2) //')
-// example('Primary','(1)')
-// example('Expression','(1)')
-// example('Primary','[1,2,3]')
-// example('Expression','[1,2,3]')
-// example('Primary',"{ name: 'naruto', age: 17 }")
-// example('Expression',"{ name: 'naruto', age: 17 }")
-// example('Expression',"f'{a}+{1}'")
-// example('Expression','world(\n    hoge=1,\n    hoge=1*2**2*3\n)\n')
 
 // pegpy nezcc -g math.tpeg parser.ts > math.ts
 // npx ts-node math.ts

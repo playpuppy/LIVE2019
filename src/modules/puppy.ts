@@ -5,6 +5,7 @@ enum PuppyActionTypes {
   SET_SIZE = 'SET_SIZE',
   SET_PUPPY = 'SET_PUPPY',
   SET_ISLIVE = 'SET_ISLIVE',
+  SET_SHOWTLICON = 'SET_SHOWTLICON',
 }
 
 interface SetSizeAction extends Action {
@@ -51,13 +52,32 @@ export const setIsLive = (isLive: boolean) => ({
   },
 });
 
-export type PuppyActions = SetSizeAction | SetPuppyAction | SetIsLiveAction;
+interface SetShowTLIconAction extends Action {
+  type: PuppyActionTypes.SET_SHOWTLICON;
+  payload: {
+    showTLIcon: boolean;
+  };
+}
+
+export const setShowTLIcon = (showTLIcon: boolean) => ({
+  type: PuppyActionTypes.SET_SHOWTLICON,
+  payload: {
+    showTLIcon,
+  },
+});
+
+export type PuppyActions =
+  | SetSizeAction
+  | SetPuppyAction
+  | SetIsLiveAction
+  | SetShowTLIconAction;
 
 export type PuppyState = {
   width: number;
   height: number;
   puppy: Puppy | null;
   isLive: boolean;
+  showTLIcon: boolean;
 };
 
 const initialState: PuppyState = {
@@ -65,6 +85,7 @@ const initialState: PuppyState = {
   height: 500,
   puppy: null,
   isLive: true,
+  showTLIcon: false,
 };
 
 export const puppyReducer = (state = initialState, action: PuppyActions) => {
@@ -82,6 +103,8 @@ export const puppyReducer = (state = initialState, action: PuppyActions) => {
       return { ...state, puppy: action.payload.puppy };
     case PuppyActionTypes.SET_ISLIVE:
       return { ...state, isLive: action.payload.isLive };
+    case PuppyActionTypes.SET_SHOWTLICON:
+      return { ...state, showTLIcon: action.payload.showTLIcon };
     default:
       return state;
   }

@@ -60,14 +60,14 @@ const Course: React.FC<CourseProps> = (props: CourseProps) => {
     >
       <Card className="course-all">
         <Card.Header className="course-header">
-          <Row>
+          {/* <Row>
             <button
               className="close-button"
               onClick={() => props.setVisible(false)}
             >
               <FontAwesomeIcon icon={faTimes} />
             </button>
-          </Row>
+          </Row> */}
           <Row>
             <Col className="card-header-left" xs={6}>
               {props.course.list &&

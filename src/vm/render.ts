@@ -3,6 +3,8 @@
 
 // https://ja.stackoverflow.com/questions/4445/matter-jsという物理エンジンライブラリのオブジェクトの結合について
 
+import { PATH_PREFIX } from '../env';
+
 export const myRender = render => {
   const _getTexture = (render, imagePath: string) => {
     let image = render.textures[imagePath];
@@ -18,7 +20,7 @@ export const myRender = render => {
     ) {
       image.src = imagePath;
     } else {
-      image.src = `/image/${imagePath}`;
+      image.src = `${PATH_PREFIX}/image/${imagePath}`;
     }
     return image;
   };

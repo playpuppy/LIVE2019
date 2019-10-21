@@ -27,7 +27,7 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
           {' Puppy'}
         </Navbar.Brand>
         <Nav className="mr-auto">
-          <NavDropdown title={props.course.title} id="nav-dropdown-courses">
+          <NavDropdown title={'Courseware'} id="nav-dropdown-courses">
             {Object.keys(props.courses).map(course_path => {
               const course = props.courses[course_path];
               return (

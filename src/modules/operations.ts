@@ -1,12 +1,14 @@
 import { setTheme, setCode, setMarker, setDecoration } from './editor';
 import { CourseShape, setCourse, setContent, setCources } from './course';
-import { setPuppy } from './puppy';
+import { setPuppy, setShowTLIcon } from './puppy';
 import { setPlaceholder, setShow } from './input';
 import { PuppyCode, Puppy, runPuppy, ErrorLog } from '../vm/vm';
 import store, { ReduxActions } from '../store';
 import { compile } from '../puppy-transpiler/puppy';
 
 import { Range } from 'monaco-editor';
+
+import { PATH_PREFIX } from '../env';
 
 const checkError = (
   dispatch: (action: ReduxActions) => void,
@@ -18,6 +20,10 @@ const checkError = (
   for (const e of code.errors) {
     if (e.type === 'error') {
       error_count += 1;
+    }
+    // ignore info
+    if (e.type === 'info') {
+      continue;
     }
     annos.push(e);
     // editor.getSession().setAnnotations(annos);
@@ -122,7 +128,7 @@ const loadFile: (path: string) => Promise<string> = path => {
 export const fetchSetting = (dispatch: (action: ReduxActions) => void) => (
   path: string
 ): Promise<void> =>
-  loadFile(`/LIVE2019/course/${path}/setting.json`)
+  loadFile(`${PATH_PREFIX}/course/${path}/setting.json`)
     .then((s: string) => {
       return JSON.parse(s);
     })
@@ -137,7 +143,7 @@ export const fetchContent = (dispatch: (action: ReduxActions) => void) => (
   coursePath: string,
   path: string
 ): Promise<void> =>
-  loadFile(`/LIVE2019/course/${coursePath}/${path}/index.md`).then(
+  loadFile(`${PATH_PREFIX}/course/${coursePath}/${path}/index.md`).then(
     (content: string) => dispatch(setContent(content))
   );
 
@@ -148,13 +154,13 @@ export const fetchSample = (dispatch: (action: ReduxActions) => void) => (
   path: string
 ): void => {
   const sample = window.sessionStorage.getItem(
-    `/LIVE2019/course/${coursePath}/${path}/sample.py`
+    `${PATH_PREFIX}/course/${coursePath}/${path}/sample.py`
   );
   if (sample) {
     dispatch(setCode(sample));
     trancepile(dispatch)(puppy, sample, false);
   } else {
-    loadFile(`/LIVE2019/course/${coursePath}/${path}/sample.py`).then(
+    loadFile(`${PATH_PREFIX}/course/${coursePath}/${path}/sample.py`).then(
       (sample: string) => {
         dispatch(setCode(sample));
         trancepile(dispatch)(puppy, sample, false);
@@ -176,6 +182,9 @@ export const getInputValue = async (msg: string) => {
 };
 
 export const getIsLive = () => store.getState().puppy.isLive;
+
+export const showTimeLeapIcon = () =>
+  new Promise(resolve => resolve(store.dispatch(setShowTLIcon(true))));
 
 export const getDiffStartLineNumber = () => {
   const num = store.getState().editor.diffStartLineNumber;
@@ -208,9 +217,9 @@ export const fetchCourses = (
 ) => (): void => {
   const courses: { [path: string]: CourseShape } = {};
   const get_course: Promise<void>[] = [];
-  ['Puppy', 'PuppyCourse', 'LIVE2019'].forEach(path => {
+  ['LIVE2019'].forEach(path => {
     get_course.push(
-      loadFile(`/LIVE2019/course/${path}/setting.json`)
+      loadFile(`${PATH_PREFIX}/course/${path}/setting.json`)
         .then((s: string) => {
           return JSON.parse(s);
         })
