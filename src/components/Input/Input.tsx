@@ -24,6 +24,7 @@ const Input: React.FC<InputProps> = (props: InputProps) => {
               placeholder={props.placeholder}
               value={props.value}
               onChange={e => props.setValue(e.target.value)}
+              onSubmit={() => false}
             />
             <InputGroup.Append>
               <Button type="submit">送信する</Button>

@@ -91,6 +91,7 @@ export class Puppy {
   public waitRestart: boolean;
   public isExecuting: boolean;
   private isDisposed: boolean;
+  private inTimeLeap: boolean;
 
   private runner: Matter.Runner | null;
   private engine: Matter.Engine | null;
@@ -116,6 +117,7 @@ export class Puppy {
     this.render = null;
     this.canvas = null;
     this.vars = {};
+    this.inTimeLeap = false;
     this.lib = new Lib(this, {
       Body: Matter.Body,
       Composite: Matter.Composite,
@@ -375,21 +377,23 @@ export class Puppy {
 
   public async execute_main() {
     const diffStartLineNumber = getDiffStartLineNumber();
-    let isTimeLeaped = false;
+    let isFirstLeap = true;
     this.isExecuting = true;
     for await (const lineNumber of this.code.main(this)) {
       if (this.isDisposed) {
         break;
       }
       if (lineNumber < diffStartLineNumber && getIsLive()) {
-        if(!isTimeLeaped){
+        this.inTimeLeap = true;
+        if (isFirstLeap) {
           await showTimeLeapIcon();
-          isTimeLeaped = true;
+          isFirstLeap = false;
         }
         for (let i = 0; i < this.interval / this.runner!.delta; i += 1) {
           this.engine = Engine.update(this.engine!, undefined, undefined);
         }
       } else {
+        this.inTimeLeap = false;
         setCodeHighlight(lineNumber, lineNumber);
         await this.waitForRun(1000);
         await this.wait(this.interval / 2);
@@ -551,10 +555,15 @@ export class Puppy {
   };
 
   public async input(msg?: string) {
+    const cahce = window.sessionStorage.getItem('/input/cahche');
+    if (this.inTimeLeap && cahce) {
+      return cahce;
+    }
     this.runner!.enabled = false;
     const x = await getInputValue(msg ? msg : '');
     this.runner!.enabled = true;
     this.waitForRun(500);
+    window.sessionStorage.setItem(`/input/cahche`, x);
     console.log(`input ${x}`);
     return x;
   }
