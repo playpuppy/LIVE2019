@@ -4,7 +4,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/LIVE2019/editor.worker.js"
   },
   {
-    "revision": "9b1be3b8d5b7aef0a9d7319c3c2190d1",
+    "revision": "409fe221b1af6e510c9fbf373cf6abbe",
     "url": "/LIVE2019/index.html"
   },
   {
@@ -12,7 +12,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/LIVE2019/static/css/3.6eae6d91.chunk.css"
   },
   {
-    "revision": "dce2be8ac588047c921e",
+    "revision": "a1c69fcefc0f830dd4ac",
     "url": "/LIVE2019/static/css/main.90b797b4.chunk.css"
   },
   {
@@ -248,8 +248,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/LIVE2019/static/js/9.dc265d32.chunk.js"
   },
   {
-    "revision": "dce2be8ac588047c921e",
-    "url": "/LIVE2019/static/js/main.37fe6fae.chunk.js"
+    "revision": "a1c69fcefc0f830dd4ac",
+    "url": "/LIVE2019/static/js/main.6c0be97d.chunk.js"
   },
   {
     "revision": "c9da20f8cc00c7f6997b",
